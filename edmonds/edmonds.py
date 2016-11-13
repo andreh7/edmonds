@@ -134,24 +134,34 @@ def mst(root,G):
     and a call to G[v] loads the web page and finds its links.
     """
 
+    # reverse the graph to get incoming edges of each node
     RG = _reverse(G)
     if root in RG:
         RG[root] = {}
+        
+    # g is the returned arborescence
     g = {}
     for n in RG:
         if len(RG[n]) == 0:
             continue
+            
+        # find incoming edge of n with minimum weight 
+        # (minimial with respect to all incoming edges of n)
         minimum = sys.maxint
         s,d = None,None
         for e in RG[n]:
             if RG[n][e] < minimum:
                 minimum = RG[n][e]
                 s,d = n,e
+                
+        # d is the neighbour vertex with the minimum weight
+        # edge going to n
         if d in g:
             g[d][s] = RG[s][d]
         else:
             g[d] = { s : RG[s][d] }
             
+    # search for cycles in candidate arborescence
     cycles = []
     visited = set()
     for n in g:
