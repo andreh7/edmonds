@@ -59,43 +59,72 @@ def _mergeCycles(cycle,G,RG,g,rg):
     g     - the candidate minimum weight arborescence found so far (which includes cycles)
     rg    - the reverse of g
     """
-    
+    # list of edges which 'come into the cycle' (i.e.
+    # go from a vertex which is not member of the cycle
+    # to a vertex in the cycle). Each element is a pair
+    # (u,v) where u is a node outside the cycle and
+    # v is a member node of the cycle
     allInEdges = []
+    
     minInternal = None
     minInternalWeight = sys.maxint
 
-    # find minimal internal edge weight
+    #----------
+    # find edge inside cycle with minimal weight
+    #----------
     for n in cycle:
         for e in RG[n]:
             if e in cycle:
+                # (n,e) is an edge within the cycle
+                
+                # update minInternal and minInternalWeight
                 if minInternal is None or RG[n][e] < minInternalWeight:
                     minInternal = (n,e)
                     minInternalWeight = RG[n][e]
                     continue
             else:
+                # (n,e) is an edge coming into the cycle
                 allInEdges.append((n,e))        
 
-    # find the incoming edge with minimum modified cost
+    #----------
+    # find the incoming edge (incoming to the cycle) with minimum modified cost
+    #----------
     minExternal = None
     minModifiedWeight = 0
     for s,t in allInEdges:
+        # s is a node outside the cycle, t is a member node of the cycle
+
+        # remove edge (s -> u) from reversed arborescence
         u,v = rg[s].popitem()
+        
+        # add edge (s -> u) with weight v to reversed arborescence
         rg[s][u] = v
+        
+        # calculate modified weight/cost
         w = RG[s][t] - (v - minInternalWeight)
+        
+        # update minimum
         if minExternal is None or minModifiedWeight > w:
+            # (s,t) is an edge coming into the cycle
             minExternal = (s,t)
             minModifiedWeight = w
 
     u,w = rg[minExternal[0]].popitem()
+    
+    # edge to be removed/replaced
     rem = (minExternal[0],u)
+    
     rg[minExternal[0]].clear()
+    
     if minExternal[1] in rg:
         rg[minExternal[1]][minExternal[0]] = w
     else:
         rg[minExternal[1]] = { minExternal[0] : w }
+    
     if rem[1] in g:
         if rem[0] in g[rem[1]]:
             del g[rem[1]][rem[0]]
+            
     if minExternal[1] in g:
         g[minExternal[1]][minExternal[0]] = w
     else:
