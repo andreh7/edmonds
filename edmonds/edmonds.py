@@ -50,6 +50,16 @@ def _getCycle(n,g,visited=set(),cycle=[]):
     return cycle
 
 def _mergeCycles(cycle,G,RG,g,rg):
+    """
+    arguments:
+
+    cycle - a list of nodes in the cycle to be processed.
+    G     - the original graph for which the minimum weight arborescence should be determined
+    RG    - the reversed graph of G
+    g     - the candidate minimum weight arborescence found so far (which includes cycles)
+    rg    - the reverse of g
+    """
+    
     allInEdges = []
     minInternal = None
     minInternalWeight = sys.maxint
