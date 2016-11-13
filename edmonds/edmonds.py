@@ -40,13 +40,24 @@ def _reverse(graph):
     return r
 
 def _getCycle(n,g,visited=set(),cycle=[]):
+    # Returns a list of nodes in the connected 
+    # component in g starting with n.
+    # The nodes are returned in depth first search
+    # pre-order traversal order
+    
     visited.add(n)
     cycle += [n]
     if n not in g:
         return cycle
+    
+    # loop over neighbours of n (corresponding to edges
+    # outgoing from n)
     for e in g[n]:
         if e not in visited:
+            
+            # depth first search
             cycle = _getCycle(e,g,visited,cycle)
+            
     return cycle
 
 def _mergeCycles(cycle,G,RG,g,rg):
@@ -200,7 +211,9 @@ def mst(root,G):
         else:
             g[d] = { s : RG[s][d] }
             
-    # search for cycles in candidate arborescence
+    #----------
+    # search for cycles in candidate arborescence g
+    #----------
     cycles = []
     visited = set()
     for n in g:
@@ -208,6 +221,7 @@ def mst(root,G):
             cycle = _getCycle(n,g,visited)
             cycles.append(cycle)
 
+    #----------
     rg = _reverse(g)
     for cycle in cycles:
         if root in cycle:
